@@ -1,6 +1,8 @@
 <template>
     <div>
-        <div class="form-group" v-for="column in columns">
+        <div class="form-group" v-for="(column, columnIndex) in columns">
+            <button class="pull-right btn-sm btn-danger" @click.prevent="removeColumn(columnIndex)">Remove Column</button>
+
             <div class="form-group">
                 <label>Column name:</label>
                 <input type="text" class="form-control" name="column_name" v-model="column.name">
@@ -48,6 +50,10 @@
                 };
 
                 this.columns.push(column)
+            },
+
+            removeColumn(columnIndex) {
+                this.columns.splice(columnIndex, 1)
             },
 
             sendColumns() {
