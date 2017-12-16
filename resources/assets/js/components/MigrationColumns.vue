@@ -24,6 +24,7 @@
         </div>
 
         <button @click.prevent="addColumn" class="btn btn-default">Add Column</button>
+        <button @click.prevent="sendColumns" class="btn btn-default">Send Columns</button>
     </div>
 </template>
 
@@ -47,6 +48,19 @@
                 };
 
                 this.columns.push(column)
+            },
+
+            sendColumns() {
+                axios
+                    .post('api/generate', {
+                        columns: this.columns
+                    })
+                    .then((response) => {
+                        console.log(response.data)
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                    })
             }
         }
     }
