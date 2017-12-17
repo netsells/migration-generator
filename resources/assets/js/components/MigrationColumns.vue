@@ -2,7 +2,7 @@
     <div>
         <div class="form-group" v-for="(column, columnIndex) in columns">
             <button class="pull-right btn-sm btn-danger" @click.prevent="removeColumn(columnIndex)">
-                Remove Column
+                <span class="fa fa-times"></span> Remove Column
             </button>
 
             <div class="form-group">
@@ -38,7 +38,7 @@
             </div>
         </div>
 
-        <button @click.prevent="addColumn" class="btn btn-default">Add Column</button>
+        <button @click.prevent="addColumn" class="btn btn-default"><span class="fa fa-plus-circle"></span> Add Column</button>
         <button @click.prevent="sendColumns" class="btn btn-default">Send Columns</button>
 
         <div v-if="code">
