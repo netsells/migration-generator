@@ -16,6 +16,7 @@ window.Vue = require('vue');
  */
 
 Vue.component('migration-columns', require('./components/MigrationColumns.vue'));
+Vue.component('foreign-key', require('./components/ForeignKey'));
 
 const app = new Vue({
     el: '#app'

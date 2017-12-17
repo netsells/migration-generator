@@ -27,7 +27,14 @@
                     <input type="checkbox" class="form-check-input" name="unsigned" v-model="column.unsigned">
                     Unsigned
                 </label>
+
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" name="foreign_key" v-model="column.foreign_key">
+                    Foreign Key
+                </label>
             </div>
+
+            <foreign-key v-if="column.foreign_key"></foreign-key>
 
             <hr>
         </div>
@@ -51,8 +58,14 @@
 </template>
 
 <script>
+    import ForeignKey from './ForeignKey'
+
     export default {
         name: "migration-columns",
+
+        components: {
+            ForeignKey
+        },
 
         data() {
             return {
@@ -69,7 +82,8 @@
                     name: '',
                     type: 'text',
                     nullable: false,
-                    unsigned: false
+                    unsigned: false,
+                    foreign_key: false
                 };
 
                 this.columns.push(column)
