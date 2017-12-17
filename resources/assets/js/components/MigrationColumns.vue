@@ -1,7 +1,9 @@
 <template>
     <div>
         <div class="form-group" v-for="(column, columnIndex) in columns">
-            <button class="pull-right btn-sm btn-danger" @click.prevent="removeColumn(columnIndex)">Remove Column</button>
+            <button class="pull-right btn-sm btn-danger" @click.prevent="removeColumn(columnIndex)">
+                Remove Column
+            </button>
 
             <div class="form-group">
                 <label>Column name:</label>
@@ -30,6 +32,12 @@
             <hr>
         </div>
 
+        <div v-if="errors">
+            <div class="alert alert-danger">
+                {{ errors.message }}
+            </div>
+        </div>
+
         <button @click.prevent="addColumn" class="btn btn-default">Add Column</button>
         <button @click.prevent="sendColumns" class="btn btn-default">Send Columns</button>
 
@@ -50,7 +58,8 @@
             return {
                 columns: [],
                 mysql_types: ['integer', 'string', 'enum', 'boolean', 'timestamps'],
-                code: null
+                code: null,
+                errors: null
             };
         },
 
@@ -77,9 +86,12 @@
                     })
                     .then((response) => {
                         this.code = response.data.code;
+                        this.errors = null;
                     })
                     .catch((error) => {
-                        console.log(error)
+                        if (error.response) {
+                            this.errors = error.response.data;
+                        }
                     })
             }
         }
