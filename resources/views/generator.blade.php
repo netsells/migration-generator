@@ -2,10 +2,10 @@
 
 @section('content')
     <form action="">
-        <div class="form-group">
-            <label>Table Name:</label>
-            <input type="text" name="table_name" class="form-control">
-        </div>
+        {{--<div class="form-group">--}}
+            {{--<label>Table Name:</label>--}}
+            {{--<input type="text" name="table_name" class="form-control">--}}
+        {{--</div>--}}
 
         <hr>
 
@@ -13,6 +13,6 @@
 
         <hr>
 
-        <button class="btn btn-primay">Create Migration</button>
+        {{--<button class="btn btn-primay">Create Migration</button>--}}
     </form>
 @endsection

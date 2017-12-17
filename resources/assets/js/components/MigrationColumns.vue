@@ -20,6 +20,11 @@
                     <input type="checkbox" class="form-check-input" name="nullable" v-model="column.nullable">
                     Nullable
                 </label>
+
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" name="unsigned" v-model="column.unsigned">
+                    Unsigned
+                </label>
             </div>
 
             <hr>
@@ -27,6 +32,13 @@
 
         <button @click.prevent="addColumn" class="btn btn-default">Add Column</button>
         <button @click.prevent="sendColumns" class="btn btn-default">Send Columns</button>
+
+        <div v-if="code">
+            <h2>Generated Code:</h2>
+            <div class="form-group">
+                <textarea class="form-control">{{ code }}</textarea>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -37,7 +49,8 @@
         data() {
             return {
                 columns: [],
-                mysql_types: ['int', 'text', 'enum', 'boolean', 'datetime']
+                mysql_types: ['integer', 'string', 'enum', 'boolean', 'timestamps'],
+                code: null
             };
         },
 
@@ -46,7 +59,8 @@
                 let column = {
                     name: '',
                     type: 'text',
-                    nullable: false
+                    nullable: false,
+                    unsigned: false
                 };
 
                 this.columns.push(column)
@@ -62,7 +76,7 @@
                         columns: this.columns
                     })
                     .then((response) => {
-                        console.log(response.data)
+                        this.code = response.data.code;
                     })
                     .catch((error) => {
                         console.log(error)
