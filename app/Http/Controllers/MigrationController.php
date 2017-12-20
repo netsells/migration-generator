@@ -36,6 +36,12 @@ class MigrationController extends Controller
                 $columnStatement = new MethodCall($columnStatement, 'unsigned');
             }
 
+            if ($column['is_foreign_key']) {
+                $columnStatements[] = $columnStatement;
+                $columnStatements[] = $this->foreignKeyStatement($tableVariable, $column['name']);
+                continue;
+            }
+
             $columnStatements[] = $columnStatement;
         }
         $prettyPrinter = new Standard();
@@ -50,5 +56,13 @@ class MigrationController extends Controller
         $migrationFile = file_get_contents(base_path('database/migrations/2014_10_12_000000_create_users_table.php'));
         $stmts = $parser->parse($migrationFile);
         dd($stmts);
+    }
+
+    private function foreignKeyStatement($tableVariable, $localColumnName, $foreignColumnName = 'id')
+    {
+        $foreign = new MethodCall($tableVariable, 'foreign', [new String_($localColumnName)]);
+        $references = new MethodCall($foreign, 'references', [new String_($foreignColumnName)]);
+        $foreignTable = new MethodCall($references, 'on', [new String_('foreign_table_name')]);
+        return $foreignTable;
     }
 }

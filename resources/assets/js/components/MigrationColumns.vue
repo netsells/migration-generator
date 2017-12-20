@@ -29,12 +29,33 @@
                 </label>
 
                 <label class="form-check-label">
-                    <input type="checkbox" class="form-check-input" name="foreign_key" v-model="column.foreign_key">
+                    <input type="checkbox" class="form-check-input" name="foreign_key" v-model="column.is_foreign_key">
                     Foreign Key
                 </label>
             </div>
 
-            <foreign-key v-if="column.foreign_key"></foreign-key>
+            <div v-if="column.is_foreign_key">
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label>References:</label>
+                        <input type="text" class="form-control" name="references" placeholder="MySQL Table name" v-model="column.foreign_key.references">
+                    </div>
+
+                    <div class="form-group">
+                        <label>On Delete:</label>
+                        <select name="on_delete" class="form-control" v-model="column.foreign_key.on_delete">
+                            <option v-for="cascade in cascades" :value="cascade">{{ cascade }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>On Update:</label>
+                        <select name="on_delete" class="form-control" v-model="column.foreign_key.on_update">
+                            <option v-for="cascade in cascades" :value="cascade">{{ cascade }}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
             <hr>
         </div>
@@ -51,25 +72,20 @@
         <div v-if="code">
             <h2>Generated Code:</h2>
             <div class="form-group">
-                <textarea class="form-control">{{ code }}</textarea>
+                <pre><code class="php">{{ code }}</code></pre>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-    import ForeignKey from './ForeignKey'
-
     export default {
         name: "migration-columns",
-
-        components: {
-            ForeignKey
-        },
 
         data() {
             return {
                 columns: [],
+                cascades: ['restrict', 'cascade'],
                 mysql_types: ['integer', 'string', 'enum', 'boolean', 'timestamps'],
                 code: null,
                 errors: null
@@ -78,12 +94,18 @@
 
         methods: {
             addColumn() {
+                // I feel this should be a single column component
                 let column = {
-                    name: '',
+                    name: null,
                     type: 'text',
                     nullable: false,
                     unsigned: false,
-                    foreign_key: false
+                    is_foreign_key: false,
+                    foreign_key: {
+                        references: null,
+                        on_delete: 'restrict',
+                        on_update: 'restrict'
+                    }
                 };
 
                 this.columns.push(column)
@@ -101,6 +123,7 @@
                     .then((response) => {
                         this.code = response.data.code;
                         this.errors = null;
+                        // this.$nextTick(() => hljs.highlightBlock(this.$refs.code_ref))
                     })
                     .catch((error) => {
                         if (error.response) {
