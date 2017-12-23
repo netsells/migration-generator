@@ -7,17 +7,20 @@ use Illuminate\Http\Request;
 
 class MigrationController extends Controller
 {
-    public function generate(Request $request, MigrationBuilder $migrationBuilder)
+    public function generate(Request $request)
     {
         $this->validate($request, [
+            'migration_name' => 'required',
             'columns.*.name' => 'required',
             'columns.*.type' => 'required',
             'columns.*.nullable' => 'required|boolean',
         ]);
 
-        $code = $migrationBuilder->generate($request->input('columns'));
+        $migrationBuilder = new MigrationBuilder($request->input('columns'), $request->input('migration_name'));
+        $code = $migrationBuilder->generate();
 
         return response()->json([
+            'file_name' => $migrationBuilder->fileName(),
             'code' => $code
         ]);
     }

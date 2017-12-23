@@ -2,6 +2,7 @@
 
 namespace App\Migration;
 
+use Carbon\Carbon;
 use PhpParser\BuilderFactory;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\Closure;
@@ -26,17 +27,34 @@ class MigrationBuilder
      * This represents the $table variable in the AST for the migration
      */
     protected $tableVariable;
+    private $columns;
+    private $migrationName;
 
-    public function generate(array $columns)
+    public function __construct(array $columns, $migrationName)
+    {
+        $this->columns = $columns;
+        $this->migrationName = $migrationName;
+    }
+
+    public function generate()
     {
         $this->tableVariable = new Variable('table');
 
-        $upStatements = $this->upStatements($columns);
-        $downStatements = $this->downStatements($columns);
+        $upStatements = $this->upStatements();
+        $downStatements = $this->downStatements();
 
         return (new Standard(['shortArraySyntax' => true]))->prettyPrintFile(
             $this->migrationStatements($upStatements, $downStatements)
         );
+    }
+
+    /**
+     * generates the Laravel convention file name
+     */
+    public function fileName()
+    {
+        $timestamp = Carbon::now()->format('Y_m_d_h_i_s');
+        return $timestamp . '_' . snake_case($this->migrationName) . '.php';
     }
 
     private function foreignKeyStatement(array $column)
@@ -84,9 +102,9 @@ class MigrationBuilder
         return new StaticCall(new Name('Schema'), 'table', [new String_($tableName), $closure]);
     }
 
-    private function upStatements($columns)
+    private function upStatements()
     {
-        foreach ($columns as $column) {
+        foreach ($this->columns as $column) {
             $columnNameParameter = new String_($column['name']);
             $columnStatement = new MethodCall($this->tableVariable, $column['type'], [$columnNameParameter]);
 
@@ -111,9 +129,9 @@ class MigrationBuilder
         return $columnStatements;
     }
 
-    private function downStatements($columns)
+    private function downStatements()
     {
-        $tableNames = collect($columns)->map(function ($column) {
+        $tableNames = collect($this->columns)->map(function ($column) {
             return new String_($column['name']);
         })->all();
         $dropColumnStmt = new MethodCall($this->tableVariable, 'dropColumn', [new Array_($tableNames)]);

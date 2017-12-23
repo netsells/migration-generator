@@ -1,5 +1,9 @@
 <template>
     <div>
+        <div class="form-group">
+            <input type="text" class="form-control" name="migration_name" placeholder="Type the name of your migration here" v-model="migration_name">
+            <p>Example: create users table</p>
+        </div>
         <div class="alert alert-info" v-if="columns.length === 0">
             Click the add column button below to get started
         </div>
@@ -73,7 +77,7 @@
         <button @click.prevent="sendColumns" class="btn btn-primary" :disabled="columns.length === 0">Generate Migration</button>
 
         <div v-if="code">
-            <h2>Generated Code:</h2>
+            <h2>{{ file_name }}</h2>
             <div class="form-group">
                 <pre><code class="php">{{ code }}</code></pre>
             </div>
@@ -91,6 +95,8 @@
                 cascades: ['restrict', 'cascade'],
                 mysql_types: ['integer', 'string', 'enum', 'boolean', 'timestamps'],
                 code: null,
+                migration_name: null,
+                file_name: null,
                 errors: null
             };
         },
@@ -121,12 +127,13 @@
             sendColumns() {
                 axios
                     .post('api/generate', {
-                        columns: this.columns
+                        columns: this.columns,
+                        migration_name: this.migration_name
                     })
                     .then((response) => {
                         this.code = response.data.code;
+                        this.file_name = response.data.file_name;
                         this.errors = null;
-                        // this.$nextTick(() => hljs.highlightBlock(this.$refs.code_ref))
                     })
                     .catch((error) => {
                         if (error.response) {

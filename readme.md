@@ -6,12 +6,18 @@ Set up your columns and types and it will generate the PHP code using nikic's ph
 ## To do:
 * ~~Support foreign keys~~
 * ~~Generate the full migration file~~
-is usually just dropping the column
-* Currently only adds columns
 * If modifying existing schema, pull in existing tables
 * Currently project is a full laravel install - would be better as a package that people pull in as a dev dependency
-* Implement validation errors
-* Support creating and modifying tables, passing table and migration name to server
+* (FE) validation errors
+    * show errors on front end
+    * highlight relevant field
+* Support creating and modifying tables - this has a knock-on effect for how the down side of the migration takes place
+* passing table name to servera
+* ~~pass migration name to server~~
+* (FE) add syntax highlighting package, to be re-applied whenever the code is updated from the server:
+    * https://highlightjs.org/
+    * When the highlighting is applied, it is currently breaking Vue's binding
+* (FE) add multi-input option for enum columns, select2?
 
 ### Generate down for migration
 * ~~drops columns~~
