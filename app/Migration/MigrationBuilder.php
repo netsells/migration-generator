@@ -2,8 +2,14 @@
 
 namespace App\Migration;
 
+use PhpParser\Builder\Class_;
+use PhpParser\BuilderFactory;
+use PhpParser\Node\Expr\Closure;
 use PhpParser\Node\Expr\MethodCall;
+use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Expr\Variable;
+use PhpParser\Node\Name;
+use PhpParser\Node\Param;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\PrettyPrinter\Standard;
 
@@ -47,7 +53,9 @@ class MigrationBuilder
             $columnStatements[] = $columnStatement;
         }
 
-        return (new Standard())->prettyPrint($columnStatements);
+        return (new Standard())->prettyPrintFile(
+            $this->migrationStatements($columnStatements, [])
+        );
     }
 
     private function foreignKeyStatement(array $column)
@@ -59,5 +67,31 @@ class MigrationBuilder
         $onUpdate = new MethodCall($foreignTable, 'onUpdate', [new String_($foreignKey['on_update'])]);
         $onDelete = new MethodCall($onUpdate, 'onDelete', [new String_($foreignKey['on_delete'])]);
         return $onDelete;
+    }
+
+    private function migrationStatements(array $upStatements, array $downStatements)
+    {
+        $tableName = 'users';
+        $className = 'CreateUsersTable';
+
+        $factory = new BuilderFactory();
+        $closure = new Closure([
+            'params' => [new Param('table', null, new Name('Blueprint'))],
+            'stmts' => $upStatements
+        ]);
+        $schemaStatement = new StaticCall(new Name('Schema'), 'table', [new String_($tableName), $closure]);
+        $class = $factory->class($className)->extend('Migration')
+            ->addStmt($factory->method('up')->makePublic()->addStmt($schemaStatement))
+            ->addStmt($factory->method('down')->makePublic()->addStmts($downStatements));
+        $builders = [
+            $factory->use('Illuminate\Support\Facades\Schema'),
+            $factory->use('Illuminate\Database\Schema\Blueprint'),
+            $factory->use('Illuminate\Database\Migrations\Migration'),
+            $class
+        ];
+
+        return collect($builders)->map(function ($builder) {
+            return $builder->getNode();
+        })->all();
     }
 }
