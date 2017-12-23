@@ -1,5 +1,8 @@
 <template>
     <div>
+        <div class="alert alert-info" v-if="columns.length === 0">
+            Click the add column button below to get started
+        </div>
         <div class="form-group" v-for="(column, columnIndex) in columns">
             <button class="pull-right btn-sm btn-danger" @click.prevent="removeColumn(columnIndex)">
                 <span class="fa fa-times"></span> Remove Column
@@ -67,7 +70,7 @@
         </div>
 
         <button @click.prevent="addColumn" class="btn btn-default"><span class="fa fa-plus-circle"></span> Add Column</button>
-        <button @click.prevent="sendColumns" class="btn btn-default">Send Columns</button>
+        <button @click.prevent="sendColumns" class="btn btn-default" :disabled="columns.length === 0">Send Columns</button>
 
         <div v-if="code">
             <h2>Generated Code:</h2>
