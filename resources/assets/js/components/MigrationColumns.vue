@@ -70,7 +70,7 @@
         </div>
 
         <button @click.prevent="addColumn" class="btn btn-default"><span class="fa fa-plus-circle"></span> Add Column</button>
-        <button @click.prevent="sendColumns" class="btn btn-default" :disabled="columns.length === 0">Send Columns</button>
+        <button @click.prevent="sendColumns" class="btn btn-primary" :disabled="columns.length === 0">Generate Migration</button>
 
         <div v-if="code">
             <h2>Generated Code:</h2>

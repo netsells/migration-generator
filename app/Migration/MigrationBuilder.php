@@ -2,7 +2,6 @@
 
 namespace App\Migration;
 
-use PhpParser\Builder\Class_;
 use PhpParser\BuilderFactory;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\Closure;
@@ -35,7 +34,7 @@ class MigrationBuilder
         $upStatements = $this->upStatements($columns);
         $downStatements = $this->downStatements($columns);
 
-        return (new Standard())->prettyPrintFile(
+        return (new Standard(['shortArraySyntax' => true]))->prettyPrintFile(
             $this->migrationStatements($upStatements, $downStatements)
         );
     }
