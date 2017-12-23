@@ -15,7 +15,7 @@
 
             <div class="form-group">
                 <label>Type:</label>
-                <select name="type" class="form-control">
+                <select name="type" class="form-control" v-model="column.type">
                     <option v-for="type in mysql_types" :value="type">{{ type }}</option>
                 </select>
             </div>
@@ -53,7 +53,7 @@
 
                     <div class="form-group">
                         <label>On Update:</label>
-                        <select name="on_delete" class="form-control" v-model="column.foreign_key.on_update">
+                        <select name="on_update" class="form-control" v-model="column.foreign_key.on_update">
                             <option v-for="cascade in cascades" :value="cascade">{{ cascade }}</option>
                         </select>
                     </div>
