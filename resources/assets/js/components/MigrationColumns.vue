@@ -1,84 +1,101 @@
 <template>
     <div>
-        <h3>Migration Settings</h3>
-        <div class="form-group">
-            <input type="text" class="form-control" name="migration_name" placeholder="Type the name of your migration here" v-model="migration_name">
-            <p class="form-text">Example: create users table, the file name and class naming conventions will be applied for you</p>
-
-            <input type="text" class="form-control" name="table_name" placeholder="MySQL table name" v-model="table_name">
-        </div>
-        <h3>Columns</h3>
-        <div class="alert alert-info" v-if="columns.length === 0">
-            Click the add column button below to get started
-        </div>
-        <div class="form-group" v-for="(column, columnIndex) in columns">
-            <button class="pull-right btn-sm btn-danger" @click.prevent="removeColumn(columnIndex)">
-                <span class="fa fa-times"></span> Remove Column
-            </button>
-
-            <div class="form-group">
-                <label>Column name:</label>
-                <input type="text" class="form-control" name="column_name" v-model="column.name">
-            </div>
-
-            <div class="form-group">
-                <label>Type:</label>
-                <select name="type" class="form-control" v-model="column.type">
-                    <option v-for="type in mysql_types" :value="type">{{ type }}</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label class="form-check-label">
-                    <input type="checkbox" class="form-check-input" name="nullable" v-model="column.nullable">
-                    Nullable
-                </label>
-
-                <label class="form-check-label">
-                    <input type="checkbox" class="form-check-input" name="unsigned" v-model="column.unsigned">
-                    Unsigned
-                </label>
-
-                <label class="form-check-label">
-                    <input type="checkbox" class="form-check-input" name="foreign_key" v-model="column.is_foreign_key">
-                    Foreign Key
-                </label>
-            </div>
-
-            <div v-if="column.is_foreign_key">
-                <div class="form-inline">
-                    <div class="form-group">
-                        <label>References:</label>
-                        <input type="text" class="form-control" name="references" placeholder="MySQL Table name" v-model="column.foreign_key.references">
-                    </div>
-
-                    <div class="form-group">
-                        <label>On Delete:</label>
-                        <select name="on_delete" class="form-control" v-model="column.foreign_key.on_delete">
-                            <option v-for="cascade in cascades" :value="cascade">{{ cascade }}</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>On Update:</label>
-                        <select name="on_update" class="form-control" v-model="column.foreign_key.on_update">
-                            <option v-for="cascade in cascades" :value="cascade">{{ cascade }}</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <hr>
-        </div>
-
         <div v-if="errors">
             <div class="alert alert-danger">
                 {{ errors.message }}
             </div>
         </div>
 
-        <button @click.prevent="addColumn" class="btn btn-default"><span class="fa fa-plus-circle"></span> Add Column</button>
-        <button @click.prevent="sendColumns" class="btn btn-primary" :disabled="columns.length === 0">Generate Migration</button>
+        <div class="pull-right">
+        <button @click.prevent="addColumn" class="btn btn-default"><span class="fa fa-plus-circle"></span> Add Column
+        </button>
+        <button @click.prevent="sendColumns" class="btn btn-primary" :disabled="columns.length === 0">Generate
+            Migration
+        </button>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Migration Settings</h3>
+                <div class="form-group">
+                    <input type="text" class="form-control" name="migration_name"
+                           placeholder="Type the name of your migration here" v-model="migration_name">
+                    <p class="form-text">Example: create users table, the file name and class naming conventions will be
+                        applied for you</p>
+
+                    <input type="text" class="form-control" name="table_name" placeholder="MySQL table name"
+                           v-model="table_name">
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <h3>Columns</h3>
+                <div class="alert alert-info" v-if="columns.length === 0">
+                    Click the add column button below to get started
+                </div>
+                <div class="form-group" v-for="(column, columnIndex) in columns">
+                    <button class="pull-right btn-sm btn-danger" @click.prevent="removeColumn(columnIndex)">
+                        <span class="fa fa-times"></span> Remove Column
+                    </button>
+
+                    <div class="form-group">
+                        <label>Column name:</label>
+                        <input type="text" class="form-control" name="column_name" v-model="column.name">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Type:</label>
+                        <select name="type" class="form-control" v-model="column.type">
+                            <option v-for="type in mysql_types" :value="type">{{ type }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-check-label">
+                            <input type="checkbox" class="form-check-input" name="nullable" v-model="column.nullable">
+                            Nullable
+                        </label>
+
+                        <label class="form-check-label">
+                            <input type="checkbox" class="form-check-input" name="unsigned" v-model="column.unsigned">
+                            Unsigned
+                        </label>
+
+                        <label class="form-check-label">
+                            <input type="checkbox" class="form-check-input" name="foreign_key"
+                                   v-model="column.is_foreign_key">
+                            Foreign Key
+                        </label>
+                    </div>
+
+                    <div v-if="column.is_foreign_key">
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <label>References:</label>
+                                <input type="text" class="form-control" name="references" placeholder="MySQL Table name"
+                                       v-model="column.foreign_key.references">
+                            </div>
+
+                            <div class="form-group">
+                                <label>On Delete:</label>
+                                <select name="on_delete" class="form-control" v-model="column.foreign_key.on_delete">
+                                    <option v-for="cascade in cascades" :value="cascade">{{ cascade }}</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>On Update:</label>
+                                <select name="on_update" class="form-control" v-model="column.foreign_key.on_update">
+                                    <option v-for="cascade in cascades" :value="cascade">{{ cascade }}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+                </div>
+            </div>
+        </div>
 
         <div v-if="code">
             <h2>{{ file_name }}</h2>

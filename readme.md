@@ -4,7 +4,7 @@ This project is a web form for building Laravel migrations.
 Set up your columns and types and it will generate the PHP code using nikic's php parser.
 
 ## To do:
-* ~~Support foreign keys~~
+* ~~Support generating foreign keys~~
 * ~~Generate the full migration file~~
 * Currently project is a full laravel install - would be better as a package that people pull in as a dev dependency
 * (FE) validation errors
