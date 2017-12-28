@@ -71,7 +71,7 @@ class MigrationBuilder
     private function migrationStatements(array $upStatements, array $downStatements)
     {
         $tableName = 'users';
-        $className = 'CreateUsersTable';
+        $className = studly_case($this->migrationName);
 
         $factory = new BuilderFactory();
 
