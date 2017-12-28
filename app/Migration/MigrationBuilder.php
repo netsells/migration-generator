@@ -33,11 +33,13 @@ class MigrationBuilder
      * is this migration creating a table or modifying?
      */
     private $isCreating = true;
+    private $tableName;
 
-    public function __construct(array $columns, $migrationName)
+    public function __construct(array $columns, $migrationName, $tableName)
     {
         $this->columns = $columns;
         $this->migrationName = $migrationName;
+        $this->tableName = $tableName;
     }
 
     public function generate()
@@ -74,7 +76,7 @@ class MigrationBuilder
 
     private function migrationStatements(array $upStatements, array $downStatements)
     {
-        $tableName = 'users';
+        $tableName = $this->tableName;
         $className = studly_case($this->migrationName);
 
         $factory = new BuilderFactory();

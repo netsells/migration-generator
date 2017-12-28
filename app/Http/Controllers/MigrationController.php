@@ -11,12 +11,17 @@ class MigrationController extends Controller
     {
         $this->validate($request, [
             'migration_name' => 'required',
+            'table_name' => 'required',
             'columns.*.name' => 'required',
             'columns.*.type' => 'required',
             'columns.*.nullable' => 'required|boolean',
         ]);
 
-        $migrationBuilder = new MigrationBuilder($request->input('columns'), $request->input('migration_name'));
+        $migrationBuilder = new MigrationBuilder(
+            $request->input('columns'),
+            $request->input('migration_name'),
+            $request->input('table_name')
+        );
         $code = $migrationBuilder->generate();
 
         return response()->json([

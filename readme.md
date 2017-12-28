@@ -13,7 +13,7 @@ Set up your columns and types and it will generate the PHP code using nikic's ph
 * Support creating and modifying tables - this has a knock-on effect for how the down side of the migration takes place
 * If modifying existing schema, pull in existing tables
 * ~~create migration should add timestamps~~
-* passing table name to server
+* ~~passing table name to server~~
 * ~~pass migration name to server~~
     * ~~use migration name for class name~~
 * (FE) add syntax highlighting package, to be re-applied whenever the code is updated from the server:

@@ -1,9 +1,13 @@
 <template>
     <div>
+        <h3>Migration Settings</h3>
         <div class="form-group">
             <input type="text" class="form-control" name="migration_name" placeholder="Type the name of your migration here" v-model="migration_name">
-            <p>Example: create users table</p>
+            <p class="form-text">Example: create users table, the file name and class naming conventions will be applied for you</p>
+
+            <input type="text" class="form-control" name="table_name" placeholder="MySQL table name" v-model="table_name">
         </div>
+        <h3>Columns</h3>
         <div class="alert alert-info" v-if="columns.length === 0">
             Click the add column button below to get started
         </div>
@@ -96,6 +100,7 @@
                 mysql_types: ['integer', 'string', 'enum', 'boolean', 'timestamps'],
                 code: null,
                 migration_name: null,
+                table_name: null,
                 file_name: null,
                 errors: null
             };
@@ -128,7 +133,8 @@
                 axios
                     .post('api/generate', {
                         columns: this.columns,
-                        migration_name: this.migration_name
+                        migration_name: this.migration_name,
+                        table_name: this.table_name
                     })
                     .then((response) => {
                         this.code = response.data.code;
