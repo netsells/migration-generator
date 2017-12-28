@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Migration\MigrationBuilder;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class MigrationController extends Controller
 {
@@ -11,6 +12,7 @@ class MigrationController extends Controller
     {
         $this->validate($request, [
             'migration_name' => 'required',
+            'migration_type' => ['required', Rule::in(['create', 'modify'])],
             'table_name' => 'required',
             'columns.*.name' => 'required',
             'columns.*.type' => 'required',
@@ -20,7 +22,8 @@ class MigrationController extends Controller
         $migrationBuilder = new MigrationBuilder(
             $request->input('columns'),
             $request->input('migration_name'),
-            $request->input('table_name')
+            $request->input('table_name'),
+            $request->input('migration_type') === 'create'
         );
         $code = $migrationBuilder->generate();
 

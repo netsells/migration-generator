@@ -7,24 +7,45 @@
         </div>
 
         <div class="pull-right">
-        <button @click.prevent="addColumn" class="btn btn-default"><span class="fa fa-plus-circle"></span> Add Column
-        </button>
-        <button @click.prevent="sendColumns" class="btn btn-primary" :disabled="columns.length === 0">Generate
-            Migration
-        </button>
+            <button @click.prevent="addColumn" class="btn btn-default">
+                <span class="fa fa-plus-circle"></span> Add Column
+            </button>
+            <button @click.prevent="sendColumns" class="btn btn-primary" :disabled="columns.length === 0">
+                Generate Migration
+            </button>
         </div>
-        
+
+        <div class="clearfix"></div>
+
         <div class="row">
             <div class="col-md-6">
                 <h3>Migration Settings</h3>
+
                 <div class="form-group">
                     <input type="text" class="form-control" name="migration_name"
                            placeholder="Type the name of your migration here" v-model="migration_name">
                     <p class="form-text">Example: create users table, the file name and class naming conventions will be
                         applied for you</p>
-
+                </div>
+                <div class="form-group">
                     <input type="text" class="form-control" name="table_name" placeholder="MySQL table name"
                            v-model="table_name">
+                </div>
+                <div class="form-group">
+                    <p>Migration Type:</p>
+
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input type="radio" class="form-check-input" name="migration_type" value="create" v-model="migration_type" checked>
+                            Create (default) - if you want this migration to create a new database table
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input type="radio" class="form-check-input" name="migration_type" value="modify" v-model="migration_type">
+                            Modify - choose this option to modify an existing table
+                        </label>
+                    </div>
                 </div>
             </div>
 
@@ -115,11 +136,14 @@
                 columns: [],
                 cascades: ['restrict', 'cascade'],
                 mysql_types: ['integer', 'string', 'enum', 'boolean', 'timestamps'],
-                code: null,
+                migration_type: null,
                 migration_name: null,
                 table_name: null,
+                errors: null,
+                // the generated code
+                code: null,
+                // migration's generated file name
                 file_name: null,
-                errors: null
             };
         },
 
@@ -151,7 +175,8 @@
                     .post('api/generate', {
                         columns: this.columns,
                         migration_name: this.migration_name,
-                        table_name: this.table_name
+                        table_name: this.table_name,
+                        migration_type: this.migration_type
                     })
                     .then((response) => {
                         this.code = response.data.code;

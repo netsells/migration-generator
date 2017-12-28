@@ -32,14 +32,15 @@ class MigrationBuilder
     /**
      * is this migration creating a table or modifying?
      */
-    private $isCreating = true;
+    private $isCreating;
     private $tableName;
 
-    public function __construct(array $columns, $migrationName, $tableName)
+    public function __construct(array $columns, $migrationName, $tableName, $isCreating = true)
     {
         $this->columns = $columns;
         $this->migrationName = $migrationName;
         $this->tableName = $tableName;
+        $this->isCreating = $isCreating;
     }
 
     public function generate()
