@@ -20,9 +20,10 @@ Set up your columns and types and it will generate the PHP code using nikic's ph
     * https://highlightjs.org/
     * When the highlighting is applied, it is currently breaking Vue's binding
 * (FE) add multi-input option for enum columns, select2?
+* (FE) add copy to clipboard for generated migration
 * add support for float/decimal
 
 ### Generate down for migration
 * ~~drops columns~~
 * drops foreign keys
-* drops created tables 
+* ~~drops created tables~~ 

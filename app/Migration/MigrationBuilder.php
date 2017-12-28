@@ -46,11 +46,8 @@ class MigrationBuilder
     {
         $this->tableVariable = new Variable('table');
 
-        $upStatements = $this->upStatements();
-        $downStatements = $this->downStatements();
-
         return (new Standard(['shortArraySyntax' => true]))->prettyPrintFile(
-            $this->migrationStatements($upStatements, $downStatements)
+            $this->migrationStatements()
         );
     }
 
@@ -74,18 +71,18 @@ class MigrationBuilder
         return $onDelete;
     }
 
-    private function migrationStatements(array $upStatements, array $downStatements)
+    private function migrationStatements()
     {
         $tableName = $this->tableName;
         $className = studly_case($this->migrationName);
 
-        $factory = new BuilderFactory();
+        $factory = new BuilderFactory;
 
         $class = $factory->class($className)->extend('Migration')
             ->addStmt($factory->method('up')->makePublic()
-                ->addStmt($this->schemaStatement($upStatements, $tableName)))
+                ->addStmt($this->upStatement($tableName)))
             ->addStmt($factory->method('down')->makePublic()
-                ->addStmt($this->schemaStatement($downStatements, $tableName)));
+                ->addStmt($this->downStatement($tableName)));
 
         $builders = [
             $factory->use('Illuminate\Support\Facades\Schema'),
@@ -99,15 +96,22 @@ class MigrationBuilder
         })->all();
     }
 
-    private function schemaStatement(array $statements, $tableName)
+    private function schemaStatement(array $statements, $tableName, $creating = false)
     {
+        // name of the method to call off the Schema facade
+        $schemaMethodName = $creating ? 'create' : 'table';
+
         $closure = new Closure([
-            'params' => [new Param('table', null, new Name('Blueprint'))],
+            'params' => [new Param($schemaMethodName, null, new Name('Blueprint'))],
             'stmts' => $statements
         ]);
         return new StaticCall(new Name('Schema'), 'table', [new String_($tableName), $closure]);
     }
 
+    /**
+     * Statements which are inside the Schema closure argument inside the up method
+     * @return array
+     */
     private function upStatements()
     {
         foreach ($this->columns as $column) {
@@ -151,5 +155,25 @@ class MigrationBuilder
     private function timestampColumnsStatement()
     {
         return new MethodCall($this->tableVariable, 'timestamps');
+    }
+
+    /*
+     * Will return the body of the up() method
+     */
+    private function upStatement($tableName): StaticCall
+    {
+        return $this->schemaStatement($this->upStatements(), $tableName);
+    }
+
+    /*
+     * Will return the body for the down() method
+     */
+    private function downStatement($tableName): StaticCall
+    {
+        if ($this->isCreating) {
+            return new StaticCall(new Name('Schema'), 'dropIfExists', [new String_($tableName)]);
+        }
+
+        return $this->schemaStatement($this->downStatements(), $tableName);
     }
 }
