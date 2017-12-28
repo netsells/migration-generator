@@ -12,7 +12,7 @@ Set up your columns and types and it will generate the PHP code using nikic's ph
     * highlight relevant field
 * Support creating and modifying tables - this has a knock-on effect for how the down side of the migration takes place
 * If modifying existing schema, pull in existing tables
-* create migration should add timestamps
+* ~~create migration should add timestamps~~
 * passing table name to server
 * ~~pass migration name to server~~
     * ~~use migration name for class name~~
@@ -20,6 +20,7 @@ Set up your columns and types and it will generate the PHP code using nikic's ph
     * https://highlightjs.org/
     * When the highlighting is applied, it is currently breaking Vue's binding
 * (FE) add multi-input option for enum columns, select2?
+* add support for float/decimal
 
 ### Generate down for migration
 * ~~drops columns~~

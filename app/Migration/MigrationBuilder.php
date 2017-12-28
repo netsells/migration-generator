@@ -29,6 +29,10 @@ class MigrationBuilder
     protected $tableVariable;
     private $columns;
     private $migrationName;
+    /**
+     * is this migration creating a table or modifying?
+     */
+    private $isCreating = true;
 
     public function __construct(array $columns, $migrationName)
     {
@@ -126,6 +130,10 @@ class MigrationBuilder
             $columnStatements[] = $columnStatement;
         }
 
+        if ($this->isCreating) {
+            $columnStatements[] = $this->timestampColumnsStatement();
+        }
+
         return $columnStatements;
     }
 
@@ -136,5 +144,10 @@ class MigrationBuilder
         })->all();
         $dropColumnStmt = new MethodCall($this->tableVariable, 'dropColumn', [new Array_($tableNames)]);
         return [$dropColumnStmt];
+    }
+
+    private function timestampColumnsStatement()
+    {
+        return new MethodCall($this->tableVariable, 'timestamps');
     }
 }
