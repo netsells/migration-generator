@@ -16,6 +16,8 @@ Set up your columns and types and it will generate the PHP code using nikic's ph
 * (FE) add multi-input option for enum columns, select2?
 * (FE) add copy to clipboard for generated migration
 * add support for float/decimal
+* add support for default values
+* add command to pipe into file `pbpaste >> migration_name.php`
 * ~~Support creating and modifying tables - this has a knock-on effect for how the down side of the migration takes place~~
 * ~~Support generating foreign keys~~
 * ~~Generate the full migration file~~

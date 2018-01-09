@@ -57,7 +57,7 @@ class MigrationBuilder
      */
     public function fileName()
     {
-        $timestamp = Carbon::now()->format('Y_m_d_h_i_s');
+        $timestamp = Carbon::now()->format('Y_m_d_his');
         return $timestamp . '_' . snake_case($this->migrationName) . '.php';
     }
 
