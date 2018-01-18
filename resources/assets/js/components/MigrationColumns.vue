@@ -126,13 +126,15 @@
         <div v-if="code">
             <h2>{{ file_name }}</h2>
             <div class="form-group">
-                <pre><code class="php">{{ code }}</code></pre>
+                <pre><code class="php" ref="code">{{ code }}</code></pre>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+    import hljs from 'highlight.js';
+
     export default {
         name: "migration-columns",
 
@@ -176,6 +178,9 @@
             },
 
             sendColumns() {
+                // clear the code property first
+                this.code = "";
+
                 axios
                     .post('api/generate', {
                         columns: this.columns,
@@ -193,6 +198,14 @@
                             this.errors = error.response.data;
                         }
                     })
+            }
+        },
+
+        watch: {
+            code() {
+                this.$nextTick(() => {
+                    hljs.highlightBlock(this.$refs.code);
+                });
             }
         }
     }
