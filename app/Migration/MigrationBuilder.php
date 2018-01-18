@@ -124,6 +124,11 @@ class MigrationBuilder
                 $columnStatement = new MethodCall($columnStatement, 'nullable');
             }
 
+            if ($column['default']) {
+                // for chained method calls the expression is the input / variable to the next method call
+                $columnStatement = new MethodCall($columnStatement, 'default', [new String_($column['default'])]);
+            }
+
             if ($column['unsigned']) {
                 $columnStatement = new MethodCall($columnStatement, 'unsigned');
             }

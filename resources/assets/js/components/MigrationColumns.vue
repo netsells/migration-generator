@@ -65,6 +65,11 @@
                     </div>
 
                     <div class="form-group">
+                        <label>Default Value:</label>
+                        <input type="text" class="form-control" v-model="column.default">
+                    </div>
+
+                    <div class="form-group">
                         <label>Type:</label>
                         <select name="type" class="form-control" v-model="column.type">
                             <option v-for="type in mysql_types" :value="type">{{ type }}</option>
@@ -135,7 +140,7 @@
             return {
                 columns: [],
                 cascades: ['restrict', 'cascade'],
-                mysql_types: ['integer', 'string', 'enum', 'boolean', 'timestamps'],
+                mysql_types: ['integer', 'string', 'text', 'enum', 'boolean', 'timestamps'],
                 migration_type: null,
                 migration_name: null,
                 table_name: null,
