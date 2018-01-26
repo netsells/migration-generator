@@ -54,79 +54,27 @@
                 <div class="alert alert-info" v-if="columns.length === 0">
                     Click the add column button below to get started
                 </div>
-                <div class="form-group" v-for="(column, columnIndex) in columns">
-                    <button class="pull-right btn-sm btn-danger" @click.prevent="removeColumn(columnIndex)">
-                        <span class="fa fa-times"></span> Remove Column
-                    </button>
-
-                    <div class="form-group">
-                        <label>Column name:</label>
-                        <input type="text" class="form-control" name="column_name" v-model="column.name">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Default Value:</label>
-                        <input type="text" class="form-control" v-model="column.default">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Type:</label>
-                        <select name="type" class="form-control" v-model="column.type">
-                            <option v-for="type in mysql_types" :value="type">{{ type }}</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" name="nullable" v-model="column.nullable">
-                            Nullable
-                        </label>
-
-                        <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" name="unsigned" v-model="column.unsigned">
-                            Unsigned
-                        </label>
-
-                        <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" name="foreign_key"
-                                   v-model="column.is_foreign_key">
-                            Foreign Key
-                        </label>
-                    </div>
-
-                    <div v-if="column.is_foreign_key">
-                        <div class="form-inline">
-                            <div class="form-group">
-                                <label>References:</label>
-                                <input type="text" class="form-control" name="references" placeholder="MySQL Table name"
-                                       v-model="column.foreign_key.references">
-                            </div>
-
-                            <div class="form-group">
-                                <label>On Delete:</label>
-                                <select name="on_delete" class="form-control" v-model="column.foreign_key.on_delete">
-                                    <option v-for="cascade in cascades" :value="cascade">{{ cascade }}</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>On Update:</label>
-                                <select name="on_update" class="form-control" v-model="column.foreign_key.on_update">
-                                    <option v-for="cascade in cascades" :value="cascade">{{ cascade }}</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr>
-                </div>
+                <column v-for="(column, columnIndex) in columns" :column="column" :key="columnIndex"></column>
             </div>
         </div>
 
         <div v-if="code">
-            <h2>{{ file_name }}</h2>
+            <h2>{{ file_name }}
+                <div class="buttons">
+                    <a class="btn btn-default" :href="fileContent" :download="file_name">
+                        <i class="fa fa-download"></i>
+                        Download
+                    </a>
+                    <button class="btn btn-primary" @click.prevent v-clipboard:copy="code">
+                        <i class="fa fa-clipboard"></i>
+                        Copy to clipboard
+                    </button>
+                </div>
+            </h2>
             <div class="form-group">
-                <pre><code class="php" ref="code">{{ code }}</code></pre>
+                <pre>
+                    <code class="php" ref="code">{{ code }}</code>
+                </pre>
             </div>
         </div>
     </div>
@@ -142,16 +90,22 @@
             return {
                 columns: [],
                 cascades: ['restrict', 'cascade'],
-                mysql_types: ['integer', 'string', 'text', 'enum', 'boolean', 'timestamps'],
                 migration_type: null,
                 migration_name: null,
                 table_name: null,
                 errors: null,
+                loading: false,
                 // the generated code
                 code: null,
                 // migration's generated file name
                 file_name: null,
             };
+        },
+
+        computed: {
+            fileContent() {
+                return 'data:application/octet-stream,' + encodeURI(this.code);
+            }
         },
 
         methods: {
@@ -178,8 +132,12 @@
             },
 
             sendColumns() {
+                if (this.loading) {
+                    return;
+                }
                 // clear the code property first
                 this.code = "";
+                this.loading = true;
 
                 axios
                     .post('api/generate', {
@@ -192,17 +150,24 @@
                         this.code = response.data.code;
                         this.file_name = response.data.file_name;
                         this.errors = null;
+                        this.loading = false;
                     })
                     .catch((error) => {
+                        this.loading = false;
+
                         if (error.response) {
                             this.errors = error.response.data;
                         }
-                    })
+                    });
             }
         },
 
         watch: {
-            code() {
+            code(value) {
+                if (!value) {
+                    return;
+                }
+
                 this.$nextTick(() => {
                     hljs.highlightBlock(this.$refs.code);
                 });
@@ -211,6 +176,26 @@
     }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+    h2 {
+        &:after {
+            clear: both;
+            display: block;
+            content: '';
+        }
+    }
 
+    pre {
+        font-size: 0;
+        padding: 0;
+
+        code {
+            font-size: 14px;
+        }
+    }
+
+    .buttons {
+        display: inline-block;
+        float: right;
+    }
 </style>
