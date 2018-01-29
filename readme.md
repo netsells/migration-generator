@@ -6,11 +6,11 @@ Set up your columns and types and it will generate the PHP code using nikic's ph
 ## To do:
 * Currently project is a full laravel install - would be better as a package that people pull in as a dev dependency
 * (FE) validation errors
-    * show errors on front end
-    * highlight relevant field
+    * ~~show errors on front end~~
+    * ~~highlight relevant field~~
 * If modifying existing schema, pull in existing tables
-* (FE) add multi-input option for enum columns, select2?
-* (FE) add copy to clipboard for generated migration
+* ~~(FE) add multi-input option for enum columns, select2?~~
+* ~~(FE) add copy to clipboard for generated migration~~
 * add support for float/decimal
 * add command to pipe into file `pbpaste >> migration_name.php`
 * ~~add support for default values~~

@@ -261,7 +261,7 @@
                 // when switching the column type, clear the type-specific data
                 handler: function(val) {
                     $(document).trigger('reloadInvalidInputHandler');
-                    // with the exception of boolean type, which by default isn't nullable
+                    // with the exception of boolean type, which by default is only true/false and null is not expected
                     this.column.default = (val === 'boolean' ? true : null);
                     this.column.options = [];
                     this.column.length = null;
