@@ -3,21 +3,10 @@
         <div v-if="errors">
             <div class="alert alert-danger">
                 <p v-for="error in errors" >
-                    {{ error[0]}}
+                    {{ error[0] }}
                 </p>
             </div>
         </div>
-
-        <div class="pull-right">
-            <button @click.prevent="addColumn" class="btn btn-default">
-                <span class="fa fa-plus-circle"></span> Add Column
-            </button>
-            <button @click.prevent="sendColumns" class="btn btn-primary" :disabled="columns.length === 0">
-                Generate Migration
-            </button>
-        </div>
-
-        <div class="clearfix"></div>
 
         <div class="row">
             <div class="col-md-6">
@@ -56,15 +45,27 @@
                 <div class="alert alert-info" v-if="columns.length === 0">
                     Click the add column button below to get started
                 </div>
-                <column
-                    v-for="(column, columnIndex) in columns"
-                    :column="column"
-                    :handleRemoveColumn="removeColumn.bind(this, columnIndex)"
-                    :index="columnIndex"
-                    :key="columnIndex">
-                </column>
+                <div class="columns-list">
+                    <column
+                        v-for="(column, columnIndex) in columns"
+                        :column="column"
+                        :handleRemoveColumn="removeColumn.bind(this, columnIndex)"
+                        :index="columnIndex"
+                        :key="columnIndex">
+                    </column>
+                </div>
+                <div class="text-right">
+                    <button @click.prevent="addColumn" class="btn btn-default">
+                        <span class="fa fa-plus-circle"></span> Add Column
+                    </button>
+                    <button @click.prevent="sendColumns" class="btn btn-primary" :disabled="columns.length === 0">
+                        Generate Migration
+                    </button>
+                </div>
             </div>
         </div>
+
+        <div class="clearfix"></div>
 
         <div v-if="code">
             <h2>{{ file_name }}
@@ -121,7 +122,7 @@
                 // default type is text
                 let column = {
                     name: null,
-                    type: 'text',
+                    type: 'integer',
                     nullable: false,
                     default: null,
                     // type-specific properties
@@ -228,5 +229,9 @@
     .buttons {
         display: inline-block;
         float: right;
+    }
+
+    .columns-list {
+        margin-bottom: 20px;
     }
 </style>
