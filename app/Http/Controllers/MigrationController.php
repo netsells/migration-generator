@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Migration\MigrationBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Netsells\MigrationGenerator\MigrationBuilder;
 
 class MigrationController extends Controller
 {

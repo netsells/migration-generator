@@ -9,8 +9,15 @@
         "fideloper/proxy": "~3.3",
         "laravel/framework": "5.5.*",
         "laravel/tinker": "~1.0",
-        "nikic/php-parser": "^3.1"
+        "nikic/php-parser": "^3.1",
+        "netsells/laravel-migration-generator": "^0.4"
     },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://packages.hatchly.io/repo/private/"
+        }
+    ],
     "require-dev": {
         "filp/whoops": "~2.0",
         "fzaninotto/faker": "~1.4",
