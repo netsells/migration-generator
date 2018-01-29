@@ -2,7 +2,9 @@
     <div>
         <div v-if="errors">
             <div class="alert alert-danger">
-                {{ errors.message }}
+                <p v-for="error in errors" >
+                    {{ error[0]}}
+                </p>
             </div>
         </div>
 
@@ -54,7 +56,13 @@
                 <div class="alert alert-info" v-if="columns.length === 0">
                     Click the add column button below to get started
                 </div>
-                <column v-for="(column, columnIndex) in columns" :column="column" :key="columnIndex"></column>
+                <column
+                    v-for="(column, columnIndex) in columns"
+                    :column="column"
+                    :handleRemoveColumn="removeColumn.bind(this, columnIndex)"
+                    :index="columnIndex"
+                    :key="columnIndex">
+                </column>
             </div>
         </div>
 
@@ -89,7 +97,6 @@
         data() {
             return {
                 columns: [],
-                cascades: ['restrict', 'cascade'],
                 migration_type: null,
                 migration_name: null,
                 table_name: null,
@@ -110,12 +117,23 @@
 
         methods: {
             addColumn() {
-                // I feel this should be a single column component
+                // initialise the column and its fields
+                // default type is text
                 let column = {
                     name: null,
                     type: 'text',
                     nullable: false,
+                    default: null,
+                    // type-specific properties
                     unsigned: false,
+                    // array of options, e.g. enum
+                    options: [],
+                    // input length, e.g. VARCHAR column
+                    length: null,
+                    // how many decimal digits can a float/decimal/double number have
+                    scale: null,
+                    // how many digits can a float/decimal/double number have in total
+                    precision: null,
                     is_foreign_key: false,
                     foreign_key: {
                         references: null,
@@ -124,7 +142,12 @@
                     }
                 };
 
-                this.columns.push(column)
+                this.columns.push(column);
+
+                // trigger an event to reload invalid input handler for the new fields
+                this.$nextTick(() => {
+                    $(document).trigger('reloadInvalidInputHandler');
+                });
             },
 
             removeColumn(columnIndex) {
@@ -156,10 +179,18 @@
                         this.loading = false;
 
                         if (error.response) {
-                            this.errors = error.response.data;
+                            this.errors = error.response.data.errors;
+                            this.triggerErrors(error.response.data.errors);
                         }
                     });
-            }
+            },
+
+            triggerErrors(errors) {
+                console.log(errors);
+                Object.keys(errors).forEach((error) => {
+                    $(`input[name='${error}']`).trigger('invalid');
+                });
+            },
         },
 
         watch: {

@@ -1,4 +1,3 @@
-
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -6,6 +5,7 @@
  */
 
 require('./bootstrap');
+require('./modules/Global');
 
 window.Vue = require('vue');
 
@@ -21,5 +21,14 @@ Vue.component('migration-form', require('./components/MigrationForm.vue'));
 Vue.component('column', require('./components/Column.vue'));
 
 const app = new Vue({
-    el: '#app'
+    el: '#app',
+
+    mounted() {
+        // Trigger the dom ready event so jQuery events can
+        // bind on the newly rendered virtual dom
+        this.$nextTick(() => {
+            $(document).trigger('domReady');
+        });
+
+    },
 });
