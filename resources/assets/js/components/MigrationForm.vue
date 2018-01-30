@@ -128,7 +128,7 @@
                     // type-specific properties
                     unsigned: false,
                     // array of options, e.g. enum
-                    options: [],
+                    allowed_values: [],
                     // input length, e.g. VARCHAR column
                     length: null,
                     // how many decimal digits can a float/decimal/double number have
@@ -187,7 +187,7 @@
             },
 
             triggerErrors(errors) {
-                console.log(errors);
+                window.bus.$emit('migrationErrors', errors);
                 Object.keys(errors).forEach((error) => {
                     $(`input[name='${error}']`).trigger('invalid');
                 });

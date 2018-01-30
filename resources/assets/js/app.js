@@ -20,6 +20,8 @@ Vue.use(require('vue-clipboard2'));
 Vue.component('migration-form', require('./components/MigrationForm.vue'));
 Vue.component('column', require('./components/Column.vue'));
 
+window.bus = new Vue();
+
 const app = new Vue({
     el: '#app',
 

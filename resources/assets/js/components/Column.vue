@@ -1,7 +1,7 @@
 <template>
-    <div class="migration-column card">
+    <div class="migration-column" ref="column">
 
-        <div class="column-header" :data-target="'#column-body-' + index" data-toggle="collapse">
+        <div class="column-header" :data-target="'#column-body-' + index" data-toggle="collapse" ref="header">
             <h4>Column {{ column.name ? column.name : index + 1 }}, type: {{ column.type }}</h4>
             <button class="btn-sm btn-danger" @click.prevent="handleRemoveColumn">
                 <span class="fa fa-times"></span>
@@ -44,8 +44,8 @@
 
                 <div class="form-group" v-if="canHaveOptions">
                     <label>Options:</label>
-                    <ul class="column-options" v-if="column.options.length">
-                        <li v-for="(option, index) in column.options">
+                    <ul class="column-options" v-if="column.allowed_values.length">
+                        <li v-for="(option, index) in column.allowed_values">
                             {{ option }}
                             <button class="pull-right btn-sm btn-danger" @click.prevent="removeColumnOption(index)">
                                 <span class="fa fa-times"></span> Remove
@@ -53,7 +53,7 @@
                         </li>
                     </ul>
                     <div class="input-group">
-                        <input type="text" @keyup.enter="addColumnOption" class="form-control" placeholder="Add new option..." ref="optionInput" />
+                        <input type="text" @keyup.delete="handleColumnOptionBackspace" @keyup.enter="addColumnOption" class="form-control" placeholder="Add new option..." ref="optionInput" />
                         <span class="input-group-btn">
                             <button class="btn btn-primary" @click.prevent="addColumnOption">Add</button>
                         </span>
@@ -209,7 +209,7 @@
                         },
                     ];
 
-                    return enumArray.concat(this.column.options.map((option) => {
+                    return enumArray.concat(this.column.allowed_values.map((option) => {
                         return {
                             name: option,
                             value: option,
@@ -219,6 +219,28 @@
 
                 return false;
             },
+        },
+
+        mounted() {
+            window.bus.$on('migrationErrors', (errors) => {
+                // check if there was an error with the fields
+                let columnHasError = Object.keys(errors).find((key) => {
+                    const regexp = new RegExp("column." + this.index + "*");
+                    const matchArray = key.match(regexp);
+
+                    return matchArray ? matchArray[0] : null;
+                });
+
+                if (columnHasError) {
+                    // we need to add 'with-error' class instead of 'has-error'
+                    // thanks for that, bootstrap
+                    $(this.$refs.column).addClass('with-error');
+
+                    if ($(this.$refs.header).hasClass('collapsed')) {
+                        $(this.$refs.header).trigger('click');
+                    }
+                }
+            });
         },
 
         methods: {
@@ -235,7 +257,7 @@
                 }
 
                 // add the option to the options array
-                this.column.options.push(input.value);
+                this.column.allowed_values.push(input.value);
 
                 // reset the input value
                 input.value = '';
@@ -243,12 +265,30 @@
                 input.focus();
             },
 
+            handleColumnOptionBackspace(event) {
+                if(event.key !== "Backspace") {
+                    return;
+                }
+
+                if (this.$refs.optionInput.value !== "") {
+                    return;
+                }
+
+                this.column.allowed_values.pop();
+            },
+
             removeColumnOption(index) {
-                this.column.options.splice(index, 1);
+                this.column.allowed_values.splice(index, 1);
             }
         },
 
         watch: {
+            'column': {
+                handler: function() {
+                    $(this.$refs.column).removeClass('with-error');
+                },
+                deep: true,
+            },
             'column.default': {
                 handler: function(val) {
                     if (this.column.type === 'enum') {
@@ -263,7 +303,7 @@
                     $(document).trigger('reloadInvalidInputHandler');
                     // with the exception of boolean type, which by default is only true/false and null is not expected
                     this.column.default = (val === 'boolean' ? true : null);
-                    this.column.options = [];
+                    this.column.allowed_values = [];
                     this.column.length = null;
                     this.column.precision = null;
                     this.column.scale = null;
@@ -297,6 +337,17 @@
 <style lang="scss">
     .migration-column {
         margin-bottom: 8px;
+        border-radius: 6px;
+        border: 1px solid transparent;
+
+        &.with-error {
+            border-color: #e83619;
+
+            .column-header, .column-body {
+                box-shadow: none;
+            }
+        }
+
         .column-header {
             background: white;
             border-radius: 5px 5px 0 0;
@@ -305,6 +356,7 @@
             transition: border-radius 0.5s;
             cursor: pointer;
             position: relative;
+            box-shadow: 0px 0px 5px rgba(68, 68, 68, 0.26);
 
             &.collapsed {
                 border-radius: 5px;
@@ -318,6 +370,7 @@
         }
 
         .column-body {
+            box-shadow: 0px 0px 5px rgba(68, 68, 68, 0.16);
             border: 1px solid #ccc;
             border-radius: 0 0 5px 5px;
             padding: 10px 14px;
