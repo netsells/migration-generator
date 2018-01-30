@@ -1,4 +1,4 @@
-export default [
+export const columns = [
     'boolean',
     'date',
     'datetime',
@@ -12,4 +12,9 @@ export default [
     'text',
     'timestamp',
     'timestamps',
-]
+];
+
+export const cascades = [
+    'restrict',
+    'cascade',
+];

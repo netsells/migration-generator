@@ -1,9 +1,9 @@
 <template>
     <div>
-        <div v-if="errors">
+        <div v-if="errors.length">
             <div class="alert alert-danger">
-                <p v-for="error in errors" >
-                    {{ error[0] }}
+                <p v-for="error in errors">
+                    {{ error }}
                 </p>
             </div>
         </div>
@@ -91,6 +91,7 @@
 
 <script>
     import hljs from 'highlight.js';
+    import { validationMessages } from '../modules/formatters';
 
     export default {
         name: "migration-columns",
@@ -101,7 +102,7 @@
                 migration_type: null,
                 migration_name: null,
                 table_name: null,
-                errors: null,
+                errors: [],
                 loading: false,
                 // the generated code
                 code: null,
@@ -113,7 +114,7 @@
         computed: {
             fileContent() {
                 return 'data:application/octet-stream,' + encodeURI(this.code);
-            }
+            },
         },
 
         methods: {
@@ -173,14 +174,14 @@
                     .then((response) => {
                         this.code = response.data.code;
                         this.file_name = response.data.file_name;
-                        this.errors = null;
+                        this.errors = [];
                         this.loading = false;
                     })
                     .catch((error) => {
                         this.loading = false;
 
                         if (error.response) {
-                            this.errors = error.response.data.errors;
+                            this.errors = this.columnErrors(validationMessages(error.response.data.errors));
                             this.triggerErrors(error.response.data.errors);
                         }
                     });
@@ -192,6 +193,40 @@
                     $(`input[name='${error}']`).trigger('invalid');
                 });
             },
+
+            // Beautify the text in columns-related error messages
+            // replaces columns.0. with a more understandable message
+            columnErrors(array) {
+                // regular expression we'll use to find the text we want to beautify
+                const regex = /columns\.(\d)\./;
+
+                let returnArray = array.map((elem) => {
+                    const match = elem.match(regex);
+
+                    if (match) {
+                        // get the column number from the error
+                        const index = parseInt(match[1]);
+                        // get column from columns array
+                        const column = this.columns[index];
+
+                        // if it failed, return the normal element
+                        if (!column) {
+                            return elem;
+                        }
+
+                        // if the column has a name, print it
+                        // otherwise, show a number of the column
+                        const columnName = column.name ? column.name : index + 1;
+
+                        // replace it with a beautiful text
+                        return elem.replace(regex, `column ${columnName} `);
+                    }
+
+                    return elem;
+                });
+
+                return returnArray;
+            }
         },
 
         watch: {
@@ -209,12 +244,10 @@
 </script>
 
 <style scoped lang="scss">
+    @import '~bootstrap-sass/assets/stylesheets/bootstrap/mixins/_clearfix.scss';
+
     h2 {
-        &:after {
-            clear: both;
-            display: block;
-            content: '';
-        }
+        @include clearfix();
     }
 
     pre {

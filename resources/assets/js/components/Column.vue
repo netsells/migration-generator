@@ -1,8 +1,7 @@
 <template>
     <div class="migration-column" ref="column">
-
         <div class="column-header" :data-target="'#column-body-' + index" data-toggle="collapse" ref="header">
-            <h4>Column {{ column.name ? column.name : index + 1 }}, type: {{ column.type }}</h4>
+            <h4>Column {{ beautyName }}, type: {{ column.type }}</h4>
             <button class="btn-sm btn-danger" @click.prevent="handleRemoveColumn">
                 <span class="fa fa-times"></span>
             </button>
@@ -18,18 +17,18 @@
                 <div class="form-group" v-if="canHavePrecision">
                     <label>Precision:</label>
                     <p>How many digits can a number have in total?</p>
-                    <input type="text" class="form-control" v-model="column.precision" />
+                    <input type="number" :name="inputName('precision')" class="form-control" v-model="column.precision" />
                 </div>
 
                 <div class="form-group" v-if="canHaveScale">
                     <label>Scale:</label>
                     <p>How many decimal digits can a number have?</p>
-                    <input type="text" class="form-control" v-model="column.scale" />
+                    <input type="number" :name="inputName('scale')" class="form-control" v-model="column.scale" />
                 </div>
 
                 <div class="form-group" v-if="canHaveLength">
                     <label>Length:</label>
-                    <input type="number" class="form-control" v-model="column.length" />
+                    <input type="number" :name="inputName('length')" class="form-control" v-model="column.length" />
                 </div>
 
                 <div class="form-group" v-if="canHaveDefaultValue">
@@ -39,7 +38,7 @@
                             <option v-for="(option, index) in allowedValues" :value="option.value">{{ option.name }}</option>
                         </select>
                     </template>
-                    <input v-else type="text" class="form-control" v-model="column.default" />
+                    <input v-else type="text" :name="inputName('default')" class="form-control" v-model="column.default" />
                 </div>
 
                 <div class="form-group" v-if="canHaveOptions">
@@ -62,7 +61,7 @@
 
                 <div class="form-group">
                     <label>Type:</label>
-                    <select name="type" class="form-control" v-model="column.type">
+                    <select :name="inputName('type')" class="form-control" v-model="column.type">
                         <option v-for="type in types" :value="type">{{ type }}</option>
                     </select>
                 </div>
@@ -86,25 +85,26 @@
                 </div>
 
                 <div v-if="column.is_foreign_key">
-                    <div class="form-inline">
+                    <div class="column-foreign-key">
                         <div class="form-group">
                             <label>References:</label>
                             <input type="text" class="form-control" name="references" placeholder="MySQL Table name"
                                    v-model="column.foreign_key.references">
                         </div>
 
-                        <div class="form-group">
-                            <label>On Delete:</label>
-                            <select name="on_delete" class="form-control" v-model="column.foreign_key.on_delete">
-                                <option v-for="cascade in cascades" :value="cascade">{{ cascade }}</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>On Update:</label>
-                            <select name="on_update" class="form-control" v-model="column.foreign_key.on_update">
-                                <option v-for="cascade in cascades" :value="cascade">{{ cascade }}</option>
-                            </select>
+                        <div class="form-group row">
+                            <div>
+                                <label>On Delete:</label>
+                                <select name="on_delete" class="form-control" v-model="column.foreign_key.on_delete">
+                                    <option v-for="cascade in cascades" :value="cascade">{{ cascade }}</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>On Update:</label>
+                                <select name="on_update" class="form-control" v-model="column.foreign_key.on_update">
+                                    <option v-for="cascade in cascades" :value="cascade">{{ cascade }}</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -114,7 +114,7 @@
 </template>
 
 <script>
-    import columns from '../modules/ColumnTypes';
+    import { columns, cascades } from '../modules/DatabaseConfig';
 
     export default {
         name: 'column',
@@ -123,11 +123,15 @@
         data() {
             return {
                 types: columns,
-                cascades: ['restrict', 'cascade'],
+                cascades: cascades,
             };
         },
 
         computed: {
+            beautyName() {
+                return this.column.name ? this.column.name : this.index + 1;
+            },
+
             /* TYPE-SPECIFIC methods */
             canHaveName() {
                 return this.column.type !== 'timestamps';
@@ -139,8 +143,9 @@
             },
 
             canHaveForeignKey() {
-                return this.column.type !== 'timestamps'
-                    && this.column.type !== 'enum';
+                return this.column.type === 'integer'
+                    || this.column.type === 'increments'
+                    || this.column.type === 'string';
             },
 
             canHaveLength() {
@@ -225,7 +230,7 @@
             window.bus.$on('migrationErrors', (errors) => {
                 // check if there was an error with the fields
                 let columnHasError = Object.keys(errors).find((key) => {
-                    const regexp = new RegExp("column." + this.index + "*");
+                    const regexp = new RegExp(`columns.${this.index}.*`);
                     const matchArray = key.match(regexp);
 
                     return matchArray ? matchArray[0] : null;
@@ -266,6 +271,10 @@
             },
 
             handleColumnOptionBackspace(event) {
+                if (!this.column.allowed_values) {
+                    return;
+                }
+
                 if(event.key !== "Backspace") {
                     return;
                 }
@@ -303,12 +312,18 @@
                     $(document).trigger('reloadInvalidInputHandler');
                     // with the exception of boolean type, which by default is only true/false and null is not expected
                     this.column.default = (val === 'boolean' ? true : null);
-                    this.column.allowed_values = [];
                     this.column.length = null;
                     this.column.precision = null;
                     this.column.scale = null;
                     this.column.nullable = false;
+                    this.column.is_foreign_key = false;
+                    this.column.unsigned = false;
 
+                    if (this.canHaveOptions) {
+                        this.column.allowed_values = [];
+                    } else {
+                        this.column.allowed_values = null;
+                    }
                     if (!this.canHaveName) {
                         this.column.name = null;
                     }
@@ -335,6 +350,10 @@
 </script>
 
 <style lang="scss">
+    @import '~bootstrap-sass/assets/stylesheets/bootstrap/_variables.scss';
+    @import '~bootstrap-sass/assets/stylesheets/bootstrap/mixins/_clearfix.scss';
+    @import '~bootstrap-sass/assets/stylesheets/bootstrap/mixins/_grid.scss';
+
     .migration-column {
         margin-bottom: 8px;
         border-radius: 6px;
@@ -375,6 +394,21 @@
             border-radius: 0 0 5px 5px;
             padding: 10px 14px;
             border-top: none;
+        }
+    }
+
+    .column-foreign-key {
+        background: #e7e9ec;
+        border-radius: 3px;
+        padding: 6px 10px;
+
+        .row {
+            // todo: globalise it
+            @include make-row(10px);
+
+            > div {
+                @include make-sm-column(6, 10px);
+            }
         }
     }
 

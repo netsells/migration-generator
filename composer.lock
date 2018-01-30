@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "076b31ed9a98e9cf89d513c311ec1ece",
+    "content-hash": "52372335b3230aaaec202d5d20140012",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -864,16 +864,16 @@
         },
         {
             "name": "netsells/laravel-migration-generator",
-            "version": "0.4",
+            "version": "0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/netsells/migration-generator-backend.git",
-                "reference": "0d8a5aff32a5946da13cd2f5b9e7f4dd5e197c1b"
+                "reference": "1d32d2258836f21caacf5c2734cb259122f17c64"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/netsells/migration-generator-backend/zipball/0d8a5aff32a5946da13cd2f5b9e7f4dd5e197c1b",
-                "reference": "0d8a5aff32a5946da13cd2f5b9e7f4dd5e197c1b",
+                "url": "https://api.github.com/repos/netsells/migration-generator-backend/zipball/1d32d2258836f21caacf5c2734cb259122f17c64",
+                "reference": "1d32d2258836f21caacf5c2734cb259122f17c64",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -913,10 +913,10 @@
             ],
             "description": "Generates laravel migration files",
             "support": {
-                "source": "https://github.com/netsells/migration-generator-backend/tree/master",
+                "source": "https://github.com/netsells/migration-generator-backend/tree/0.5",
                 "issues": "https://github.com/netsells/migration-generator-backend/issues"
             },
-            "time": "2018-01-27T19:18:47+00:00"
+            "time": "2018-01-30T11:44:04+00:00"
         },
         {
             "name": "nikic/php-parser",
