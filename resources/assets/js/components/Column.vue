@@ -241,6 +241,7 @@
                     // thanks for that, bootstrap
                     $(this.$refs.column).addClass('with-error');
 
+                    // collapse the column which has an error
                     if ($(this.$refs.header).hasClass('collapsed')) {
                         $(this.$refs.header).trigger('click');
                     }
@@ -271,18 +272,22 @@
             },
 
             handleColumnOptionBackspace(event) {
+                // if there are no allowed values, ignore this event
                 if (!this.column.allowed_values) {
                     return;
                 }
 
+                // if the pressed key isn't backspace, ignore this event
                 if(event.key !== "Backspace") {
                     return;
                 }
 
+                // if the input isn't empty, ignore this event
                 if (this.$refs.optionInput.value !== "") {
                     return;
                 }
 
+                // if all of the above are not met, remove the latest element from the array
                 this.column.allowed_values.pop();
             },
 
@@ -298,16 +303,9 @@
                 },
                 deep: true,
             },
-            'column.default': {
-                handler: function(val) {
-                    if (this.column.type === 'enum') {
-
-                    }
-                }
-            },
 
             'column.type': {
-                // when switching the column type, clear the type-specific data
+                // when switching the column type, clear the column data
                 handler: function(val) {
                     $(document).trigger('reloadInvalidInputHandler');
                     // with the exception of boolean type, which by default is only true/false and null is not expected

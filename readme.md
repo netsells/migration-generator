@@ -11,7 +11,7 @@ Set up your columns and types and it will generate the PHP code using nikic's ph
 * If modifying existing schema, pull in existing tables
 * ~~(FE) add multi-input option for enum columns, select2?~~
 * ~~(FE) add copy to clipboard for generated migration~~
-* add support for float/decimal
+* ~~add support for float/decimal~~
 * add command to pipe into file `pbpaste >> migration_name.php`
 * ~~add support for default values~~
 * ~~set up hosted version of project~~
