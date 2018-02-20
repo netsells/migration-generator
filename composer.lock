@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "52372335b3230aaaec202d5d20140012",
+    "content-hash": "13c24c2560c936f64eab8684864d8a00",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -874,13 +874,7 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/netsells/migration-generator-backend/zipball/1d32d2258836f21caacf5c2734cb259122f17c64",
                 "reference": "1d32d2258836f21caacf5c2734cb259122f17c64",
-                "shasum": "",
-                "mirrors": [
-                    {
-                        "url": "https://packages.hatchly.io/repo/private/dists/%package%/%version%/%reference%.%type%",
-                        "preferred": true
-                    }
-                ]
+                "shasum": ""
             },
             "require": {
                 "illuminate/support": "^5.5",
