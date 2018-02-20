@@ -88,8 +88,13 @@
                     <div class="column-foreign-key">
                         <div class="form-group">
                             <label>References:</label>
-                            <input type="text" class="form-control" name="references" placeholder="MySQL Table name"
-                                   v-model="column.foreign_key.references">
+                            <input
+                                type="text"
+                                class="form-control"
+                                name="references"
+                                placeholder="MySQL Table name"
+                                v-model="column.foreign_key.references"
+                            >
                         </div>
 
                         <div class="form-group row">
