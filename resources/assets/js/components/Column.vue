@@ -1,13 +1,13 @@
 <template>
     <div class="migration-column" ref="column">
-        <div class="column-header" :data-target="'#column-body-' + index" data-toggle="collapse" ref="header">
-            <h4>Column {{ beautyName }}, type: {{ column.type }}</h4>
-            <button class="btn-sm btn-danger" @click.prevent="handleRemoveColumn">
+        <div class="column-header" :data-target="`#column-body-${index}`" data-toggle="collapse" ref="header">
+            <h4>Column {{ columnName }}, type: {{ column.type }}</h4>
+            <button class="btn-sm btn-danger" @click.prevent="removeColumn">
                 <span class="fa fa-times"></span>
             </button>
         </div>
 
-        <div class="collapse in" :id="'column-body-' + index">
+        <div class="collapse in" :id="`column-body-${index}`">
             <div class="column-body">
                 <div class="form-group" v-if="canHaveName">
                     <label>Column name:</label>
@@ -117,7 +117,9 @@
     import { columns, cascades } from '../modules/DatabaseConfig';
 
     export default {
+
         name: 'column',
+
         props: ['column', 'handleRemoveColumn', 'index'],
 
         data() {
@@ -128,7 +130,7 @@
         },
 
         computed: {
-            beautyName() {
+            columnName() {
                 return this.column.name ? this.column.name : this.index + 1;
             },
 
@@ -239,7 +241,7 @@
                 if (columnHasError) {
                     // we need to add 'with-error' class instead of 'has-error'
                     // thanks for that, bootstrap
-                    $(this.$refs.column).addClass('with-error');
+                    this.$refs.column.classList.add('with-error');
 
                     // collapse the column which has an error
                     if ($(this.$refs.header).hasClass('collapsed')) {
@@ -250,6 +252,10 @@
         },
 
         methods: {
+            removeColumn() {
+                this.handleRemoveColumn(this.index);
+            },
+
             inputName(name) {
                 return 'columns.' + this.index + '.' + name;
             },
@@ -278,7 +284,7 @@
                 }
 
                 // if the pressed key isn't backspace, ignore this event
-                if(event.key !== "Backspace") {
+                if (event.key !== "Backspace") {
                     return;
                 }
 
@@ -299,7 +305,7 @@
         watch: {
             'column': {
                 handler: function() {
-                    $(this.$refs.column).removeClass('with-error');
+                    this.$refs.column.classList.remove('with-error');
                 },
                 deep: true,
             },
@@ -308,6 +314,7 @@
                 // when switching the column type, clear the column data
                 handler: function(val) {
                     $(document).trigger('reloadInvalidInputHandler');
+
                     // with the exception of boolean type, which by default is only true/false and null is not expected
                     this.column.default = (val === 'boolean' ? true : null);
                     this.column.length = null;

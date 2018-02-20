@@ -31,6 +31,5 @@ const app = new Vue({
         this.$nextTick(() => {
             $(document).trigger('domReady');
         });
-
     },
 });

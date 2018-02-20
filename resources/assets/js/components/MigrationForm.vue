@@ -49,7 +49,7 @@
                     <column
                         v-for="(column, columnIndex) in columns"
                         :column="column"
-                        :handleRemoveColumn="removeColumn.bind(this, columnIndex)"
+                        :handleRemoveColumn="removeColumn"
                         :index="columnIndex"
                         :key="columnIndex">
                     </column>
@@ -58,9 +58,13 @@
                     <button @click.prevent="addColumn" class="btn btn-default">
                         <span class="fa fa-plus-circle"></span> Add Column
                     </button>
-                    <button @click.prevent="sendColumns" class="btn btn-primary" :disabled="columns.length === 0">
+                    <button
+                        @click.prevent="sendColumns"
+                        class="btn btn-primary"
+                        :disabled="!columns.length"
+                    >
                         Generate Migration
-                    </button>
+                     </button>
                 </div>
             </div>
         </div>
@@ -92,9 +96,10 @@
 <script>
     import hljs from 'highlight.js';
     import { validationMessages } from '../modules/formatters';
+    import MigrationRepository from '../repositories/MigrationRepository';
 
     export default {
-        name: "migration-columns",
+        name: 'migration-columns',
 
         data() {
             return {
@@ -160,12 +165,13 @@
                 if (this.loading) {
                     return;
                 }
+
                 // clear the code property first
                 this.code = "";
                 this.loading = true;
 
-                axios
-                    .post('api/generate', {
+                MigrationRepository
+                    .generate({
                         columns: this.columns,
                         migration_name: this.migration_name,
                         table_name: this.table_name,

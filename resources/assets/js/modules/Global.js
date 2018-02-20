@@ -8,12 +8,12 @@ class Global {
     }
 
     invalidInputHandler() {
-        $(".form-control").on("invalid", function () {
+        $('.form-control').on('invalid', function () {
             // add .has-error class on invalid event
-            $(this).addClass("has-error");
+            $(this).addClass('has-error');
             // Listen to the change event on the inputs and remove the class if needed
-            $(this).one("change paste keyup", function () {
-                $(this).removeClass("has-error");
+            $(this).one('change paste keyup', function () {
+                $(this).removeClass('has-error');
             });
         });
     }
